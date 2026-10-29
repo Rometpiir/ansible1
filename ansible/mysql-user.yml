@@ -1,0 +1,29 @@
+---
+# Lab 4 Iseseisev ülesanne: MySQL root-kasutaja ja autentimise seadistamine
+- name: MySQL root kasutaja seadistamine ja paroolikaitse
+  hosts: debian_node
+  become: yes
+
+  vars:
+    mysql_root_password: "qwerty"
+
+  tasks:
+    # 1. Paigaldame Pythoni MySQL teegi
+    - name: Paigalda python3-pymysql teek
+      ansible.builtin.apt:
+        name: python3-pymysql
+        state: present
+        update_cache: yes
+
+    # 2. Autentimisandmete salvestamine faili /root/.my.cnf (õigused 0600)
+    - name: Loo /root/.my.cnf fail autentimisandmetega
+      ansible.builtin.copy:
+        dest: /root/.my.cnf
+        content: |
+          [client]
+          user=root
+          password={{ mysql_root_password }}
+          socket=/var/run/mysqld/mysqld.sock
+        owner: root
+        group: root
+        mode: '0600'

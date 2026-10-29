@@ -1,0 +1,44 @@
+---
+# Lab 4: MySQL andmebaasiserveri paigaldamine Debian kliendiserverites
+- name: MySQL serveri automaatne paigaldamine
+  hosts: debian_node
+  become: yes
+
+  tasks:
+    # 1. Kataloogi loomine allalaaditud failide jaoks
+    - name: Loome allalaaditud kataloog
+      ansible.builtin.file:
+        path: /root/allalaadimised
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    # 2. MySQL ametliku APT repositooriumi paketi allalaadimine
+    - name: Laadime MySQL APT paketi wget abil
+      ansible.builtin.shell:
+        cmd: wget -O /root/allalaadimised/mysql-apt-config_0.8.36-1_all.deb https://dev.mysql.com/get/mysql-apt-config_0.8.36-1_all.deb
+        creates: /root/allalaadimised/mysql-apt-config_0.8.36-1_all.deb
+
+    # 3. gnupg paketi paigaldamine GPG-võtmete töötlemiseks
+    - name: Paigalda gnupg
+      ansible.builtin.apt:
+        name: gnupg
+        state: present
+        update_cache: yes
+
+    # 4. MySQL repositooriumi seadistuspaketi paigaldamine .deb failist
+    - name: Installeerime mysql repositoorium
+      ansible.builtin.apt:
+        deb: /root/allalaadimised/mysql-apt-config_0.8.36-1_all.deb
+
+    # 5. APT paketihoidlate nimekirja uuendamine
+    - name: Teeme apt-le update
+      ansible.builtin.apt:
+        update_cache: yes
+
+    # 6. MySQL serveri paigaldamine
+    - name: Paigaldame mysql-server
+      ansible.builtin.apt:
+        name: mysql-server
+        state: present
