@@ -1,0 +1,6 @@
+[webservers]
+debian_node ansible_host=192.168.35.45 ansible_user=root
+centos_node ansible_host=192.168.34.240 ansible_user=root
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

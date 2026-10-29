@@ -1,0 +1,56 @@
+---
+# Lab 3: PHP paigaldamine ja testfaili loomine
+- name: PHP toetuse lisamine veebiserverisse
+  hosts: webservers
+  become: yes
+
+  tasks:
+    # 1. PHP paigaldamine Debian süsteemi
+    - name: Paigalda PHP ja Apache PHP moodul Debianis
+      ansible.builtin.apt:
+        name:
+          - php
+          - libapache2-mod-php
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    # 2. PHP paigaldamine CentOS süsteemi
+    - name: Paigalda PHP CentOSis
+      ansible.builtin.dnf:
+        name:
+          - php
+          - php-cli
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    # 3. phpinfo.php testfaili loomine Debianis
+    - name: Loo phpinfo.php fail Debianis
+      ansible.builtin.copy:
+        content: "<?php phpinfo(); ?>"
+        dest: /var/www/html/phpinfo.php
+        mode: '0644'
+      when: ansible_os_family == "Debian"
+
+    # 4. phpinfo.php testfaili loomine CentOSis
+    - name: Loo phpinfo.php fail CentOSis
+      ansible.builtin.copy:
+        content: "<?php phpinfo(); ?>"
+        dest: /var/www/html/phpinfo.php
+        mode: '0644'
+      when: ansible_os_family == "RedHat"
+
+    # 5. Veebiserveri taaskäivitamine Debianis
+    - name: Taaskäivita apache2 Debianis
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
+      when: ansible_os_family == "Debian"
+
+    # 6. Veebiserveri taaskäivitamine CentOSis
+    - name: Taaskäivita httpd CentOSis
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: ansible_os_family == "RedHat"

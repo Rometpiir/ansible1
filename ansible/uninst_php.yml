@@ -1,0 +1,30 @@
+---
+# Lab 3: PHP eemaldamise playbook
+- name: PHP eemaldamine kliendiserveritest
+  hosts: webservers
+  become: yes
+
+  tasks:
+    # 1. phpinfo.php kustutamine
+    - name: Kustuta phpinfo.php testfail
+      ansible.builtin.file:
+        path: /var/www/html/phpinfo.php
+        state: absent
+
+    # 2. PHP eemaldamine Debianist
+    - name: Eemalda PHP paketid Debianist
+      ansible.builtin.apt:
+        name:
+          - php
+          - libapache2-mod-php
+        state: absent
+      when: ansible_os_family == "Debian"
+
+    # 3. PHP eemaldamine CentOSist
+    - name: Eemalda PHP paketid CentOSist
+      ansible.builtin.dnf:
+        name:
+          - php
+          - php-cli
+        state: absent
+      when: ansible_os_family == "RedHat"

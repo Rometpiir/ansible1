@@ -1,0 +1,38 @@
+---
+# Lab 2: Apache2/httpd automaatne paigaldamine ja käivitamine
+- name: Apache veebiserveri paigaldamine ja seadistamine
+  hosts: webservers
+  become: yes
+
+  tasks:
+    # 1. Apache paigaldamine Debian/Ubuntu süsteemidesse
+    - name: Paigalda apache2 Debian süsteemis
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    # 2. Apache (httpd) paigaldamine CentOS/RHEL süsteemidesse
+    - name: Paigalda httpd CentOS süsteemis
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+    # 3. Teenuse käivitamine ja automaatkäivituse lubamine Debianis
+    - name: Käivita apache2 teenus Debianis
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: yes
+      when: ansible_os_family == "Debian"
+
+    # 4. Teenuse käivitamine ja automaatkäivituse lubamine CentOSis
+    - name: Käivita httpd teenus CentOSis
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
